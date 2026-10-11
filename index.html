@@ -177,7 +177,7 @@ input[type=number]{font-family:var(--font-mono)}
     <aside class="filters" id="filters" aria-label="Filters">
       <div class="f span2">
         <label for="q">Search</label>
-        <input id="q" type="search" placeholder="Team, college or username" autocomplete="off">
+        <input id="q" type="search" placeholder="Team, college (try IIT Delhi) or username" autocomplete="off">
       </div>
 
       <div class="f span2">
@@ -261,15 +261,15 @@ function secs(t){var a=t.split(':');return (+a[0])*3600+(+a[1])*60+(+a[2]);}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function $(id){return document.getElementById(id);}
 
-var R = raw.rows.map(function(r,i){return {i:i,rank:r[0],user:r[1],team:r[2],inst:r[3],solved:r[4],time:r[5],t:secs(r[5]),pen:r[6],mask:r[7],top:r[8]===1,type:r[9],hay:(r[2]+' '+r[3]+' '+r[1]).toLowerCase()};});
+var R = raw.rows.map(function(r,i){return {i:i,rank:r[0],user:r[1],team:r[2],inst:r[3],solved:r[4],time:r[5],t:secs(r[5]),pen:r[6],mask:r[7],top:r[8]===1,type:r[9],al:(r[9]==='Other'?'':r[9].toLowerCase()),hay:(r[2]+' '+r[3]+' '+r[1]).toLowerCase()};});
 
 /* college rank: 1 + teams from the same college ranked strictly better, so tied teams share it */
 var byInst = {};
 R.forEach(function(r){(byInst[r.inst]=byInst[r.inst]||[]).push(r.rank);});
 R.forEach(function(r){var a=byInst[r.inst],c=0;for(var x=0;x<a.length;x++){if(a[x]<r.rank)c++;}r.ir=c+1;});
 
-var instCount = {};
-R.forEach(function(r){instCount[r.inst]=(instCount[r.inst]||0)+1;});
+var instCount = {}, instAl = {};
+R.forEach(function(r){instCount[r.inst]=(instCount[r.inst]||0)+1;instAl[r.inst]=r.al;});
 var INSTS = Object.keys(instCount).sort(function(a,b){return a.localeCompare(b);});
 var instIdx = {}; INSTS.forEach(function(n,i){instIdx[n]=i;});
 var TYPES = ['IIT','NIT','IIIT','Other'];
@@ -296,11 +296,12 @@ $('hd').innerHTML=
   '<div class="pcs">'+PROBS.map(function(p,k){return '<span title="'+p+'">'+SHORT[k]+'</span>';}).join('')+'</div>';
 
 function renderInstList(){
-  var q=$('instq').value.trim().toLowerCase();
+  var qt=$('instq').value.toLowerCase().split(/\s+/).filter(Boolean);
   var out=[];
   for(var i=0;i<INSTS.length;i++){
-    var n=INSTS[i];
-    if(q && n.toLowerCase().indexOf(q)<0) continue;
+    var n=INSTS[i], nl=n.toLowerCase(), skip=false;
+    for(var j=0;j<qt.length;j++){ if(!tokMatch(qt[j],nl,instAl[n])){skip=true;break;} }
+    if(skip) continue;
     out.push('<label><input type="checkbox" data-inst="'+i+'"'+(S.insts[n]?' checked':'')+'><span>'+esc(n)+'</span><em>'+instCount[n]+'</em></label>');
   }
   $('instList').innerHTML=out.length?out.join(''):'<div class="empty" style="padding:14px">No college matches.</div>';
@@ -311,13 +312,20 @@ function renderInstSel(){
 }
 
 /* ---------- filtering ---------- */
-function tokens(){return S.q.split(/\s+/).filter(Boolean);}
+function tokens(){return S.q.toLowerCase().split(/\s+/).filter(Boolean);}
+/* "iit", "nit" and "iiit" match the institute type as whole words, so "iit" never matches IIIT colleges */
+var ALIAS_RE = {iit:/\biit\b/, nit:/\bnit\b/, iiit:/\biiit\b/};
+function tokMatch(tok, hay, alias){
+  var re = ALIAS_RE[tok];
+  if(re) return alias===tok || re.test(hay);
+  return hay.indexOf(tok)>=0;
+}
 function filtered(){
   var tk=tokens(), hasSolved=Object.keys(S.solved).length, hasInst=Object.keys(S.insts).length, hasType=Object.keys(S.types).length;
   var pk=Object.keys(S.pf);
   var rmin=S.rmin===''?null:+S.rmin, rmax=S.rmax===''?null:+S.rmax, irmax=S.irmax===''?null:+S.irmax;
   return R.filter(function(r){
-    for(var a=0;a<tk.length;a++){ if(r.hay.indexOf(tk[a])<0) return false; }
+    for(var a=0;a<tk.length;a++){ if(!tokMatch(tk[a],r.hay,r.al)) return false; }
     if(hasSolved && !S.solved[r.solved]) return false;
     if(hasInst && !S.insts[r.inst]) return false;
     if(hasType && !S.types[r.type]) return false;
