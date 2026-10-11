@@ -2,7 +2,7 @@
 
 A filterable dashboard for the tentative ICPC India Prelims 2026 ranklist (3,610 teams, 389 colleges).
 
-**Live site:** [https://Eshitanagaria.github.io/icpc-india-prelims-2026/](https://github.com/Eshitanagaria/icpc-india-prelims-2026)
+**Live site:** [https://Eshitanagaria.github.io/icpc-india-prelims-2026/](https://eshitanagaria.github.io/icpc-india-prelims-2026/)
 
 ## Features
 
