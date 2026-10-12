@@ -101,8 +101,7 @@ input[type=number]{font-family:var(--font-mono)}
 .reset{border:1px solid var(--line);background:transparent;border-radius:6px;padding:8px 12px;font-weight:500}
 .reset:hover{background:var(--accent-soft)}
 
-/* histogram */
-.hist{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:6px;align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px 10px}
+.hist{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px 10px}
 .hist .t{grid-column:1/-1;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .hist .t span:last-child{text-transform:none;letter-spacing:0;font-weight:400}
 .hb{background:none;border:0;padding:0;display:flex;flex-direction:column;align-items:stretch;gap:3px;text-align:center;min-width:0}
@@ -501,7 +500,7 @@ function activeCount(){
   return n;
 }
 function renderHist(list){
-  var c=[0,0,0,0,0,0,0,0,0,0]; list.forEach(function(r){c[r.solved]++;});
+  var c=[0,0,0,0,0,0,0,0,0,0,0]; list.forEach(function(r){c[r.solved]++;});
   var max=Math.max.apply(null,c.slice(1)); if(max<1) max=1;
   var any=Object.keys(S.solved).length>0;
   var h='<div class="t"><span>Teams by problems solved</span><span>Tap a bar to filter</span></div>';
