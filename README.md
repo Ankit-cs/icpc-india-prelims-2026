@@ -1,6 +1,6 @@
 # ICPC India Prelims 2026 Ranklist
 
-A filterable dashboard for the tentative ICPC India Prelims 2026 ranklist (3,610 teams, 389 colleges).
+A filterable dashboard for the tentative ICPC India Prelims 2026 ranklist (4,168 teams, 417 colleges).
 
 **Live site:** [https://Eshitanagaria.github.io/icpc-india-prelims-2026/](https://eshitanagaria.github.io/icpc-india-prelims-2026/)
 
